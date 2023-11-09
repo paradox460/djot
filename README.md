@@ -24,6 +24,28 @@ Djot.to_html("hello *world*!")
 # => {:ok, "<p>hello <strong>world</strong>!</p>\n"}
 ```
 
+### Sigil
+
+If you want to write Djot contents inline in an Elixir program, you can use the provided sigil
+
+```elixir
+import Djot.Sigil
+
+~d"""
+This is a Djot document. \
+It will be compiled to HTML automatically, at compile time!
+
+Here's some display math, thank you djot!
+
+$$`
+\frac{-b \pm \sqrt{b^2 - 4 a c}}{2 a}
+`
+"""
+# => "<p>This is a Djot document. <br>\nIt will be compiled to HTML automatically, at compile time!</p>\n<p><span class=\"math display\">\\[\n\\frac{-b \\pm \\sqrt{b^2 - 4 a c}}{2 a}\n\\]</span></p>\n"
+```
+
+This can be useful when paired with tools such as the [Tableau SSG](https://github.com/elixir-tools/tableau)
+
 ## Installation
 
 Add `:djot` as a dependency:
