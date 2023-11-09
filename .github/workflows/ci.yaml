@@ -1,0 +1,30 @@
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  merge_group:
+
+jobs:
+  ci:
+    name: "CI"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jdx/rtx-action@v1
+      - name: Deps Cache
+        id: deps-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: test-${{hashFiles('.rtx.toml')}}-${{hashFiles('mix.lock')}}
+          restore-keys: test-${{hashFiles('.rtx.toml')}}-
+      - name: Install Dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: mix deps.get
+      - name: Run Tests
+        run: |
+          mix test --warnings-as-errors
