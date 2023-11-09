@@ -1,4 +1,5 @@
 # Djot
+
 <div align=center>
 
 [![Hex.pm](https://img.shields.io/hexpm/v/djot?style=for-the-badge&color=%23714a94)](https://hex.pm/packages/djot)
@@ -10,6 +11,7 @@ A fast [Djot](https://djot.net) parser and formatter for Elixir.
 Djot parsing and transformations powered by the [jotdown](https://crates.io/crates/jotdown) rust crate.
 
 ## Goals
+
 - [x] Fast Djot to HTML transforms
 - [ ] Precompiled binary
 - [ ] Optional sanitization
