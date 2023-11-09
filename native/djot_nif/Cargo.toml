@@ -1,0 +1,14 @@
+[package]
+name = "djot_nif"
+version = "0.1.0"
+authors = ["Jeff Sandberg"]
+edition = "2021"
+
+[lib]
+name = "djot_nif"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+jotdown = "0.3.2"
+rustler = "0.30.0"

@@ -6,14 +6,15 @@ defmodule Djot.MixProject do
   def project do
     [
       app: :djot,
-      version: "2023.11.0",
+      version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       source_url: @source_url,
       homepage_url: @source_url,
       name: "Djot",
-      description: "A Djot parser and formatter",
-      deps: deps()
+      description: "A Djot markup language parser and formatter",
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -35,7 +36,9 @@ defmodule Djot.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.30.0"}
+      {:rustler, "~> 0.30.0"},
+
+      {:ex_doc, "~> 0.30.9", only: :dev, runtime: false}
     ]
   end
 end

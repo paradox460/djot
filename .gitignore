@@ -24,3 +24,6 @@ djot-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Rustler compiled artifacts
+/priv/native/*
