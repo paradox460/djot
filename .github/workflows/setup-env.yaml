@@ -1,0 +1,19 @@
+name: Setup Environment
+
+on:
+  workflow_call:
+
+jobs:
+  setup-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jdx/rtx-action@v1
+      - name: Deps Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: test-${{hashFiles('.rtx.toml')}}-${{hashFiles('mix.lock')}}
+          restore-keys: test-${{hashFiles('.rtx.toml')}}-

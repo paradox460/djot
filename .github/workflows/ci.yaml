@@ -1,0 +1,18 @@
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  merge_group:
+
+jobs:
+  ci:
+    name: "CI"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup-env.yaml
+      - name: Run Tests
+        run: |
+          mix test --warnings-as-errors
