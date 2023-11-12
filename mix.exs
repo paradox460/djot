@@ -24,7 +24,16 @@ defmodule Djot.MixProject do
       licenses: ["MIT"],
       links: %{
         GitHub: @source_url
-      }
+      },
+      files: ~w[
+        lib
+        native/djot_nif/src
+        native/djot_nif/.cargo
+        native/djot_nif/Cargo.*
+        mix.exs
+        README.md
+        LICENSE
+      ]
     ]
   end
 
