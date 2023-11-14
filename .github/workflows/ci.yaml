@@ -25,7 +25,6 @@ jobs:
           key: test-${{hashFiles('.rtx.toml')}}-${{hashFiles('mix.lock')}}
           restore-keys: test-${{hashFiles('.rtx.toml')}}-
       - name: Install Dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: |
           mix deps.get
       - name: Run Tests
