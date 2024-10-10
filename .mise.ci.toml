@@ -1,0 +1,3 @@
+[settings]
+# Mise installer for elixir/erlang is _slooow_, so we use erlef/setup-beam to get tool versions instead
+disable_tools = ['elixir', 'erlang']

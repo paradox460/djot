@@ -14,6 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: jdx/mise-action@v2
+        env:
+          MISE_ENV: ci
+      - uses: erlef/setup-beam@v1
+        with:
+          version-file: .tool-versions
+          version-type: strict
       - name: Deps Cache
         id: deps-cache
         uses: actions/cache@v3
@@ -22,8 +28,8 @@ jobs:
             deps
             _build
             .mix/archives/
-          key: test-${{hashFiles('.mise.toml')}}-${{hashFiles('mix.lock')}}
-          restore-keys: test-${{hashFiles('.mise.toml')}}-
+          key: test-${{hashFiles('.tool-versions')}}-${{hashFiles('mix.lock')}}
+          restore-keys: test-${{hashFiles('.tool-versions')}}-
       - name: Install Dependencies
         run: |
           mix local.hex --force --if-missing
