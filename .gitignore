@@ -27,3 +27,6 @@ djot-*.tar
 
 # Rustler compiled artifacts
 /priv/native/*
+
+# Rustler precompiled checksums
+/checksum-*.ex

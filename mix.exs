@@ -2,11 +2,14 @@ defmodule Djot.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/paradox460/djot"
+  @version "0.1.4"
+  @dev? String.ends_with?(@version, "-dev")
+  @force_build? System.get_env("DJOT_BUILD") in ~w[1 true]
 
   def project do
     [
       app: :djot,
-      version: "0.1.3",
+      version: @version,
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       source_url: @source_url,
@@ -30,6 +33,7 @@ defmodule Djot.MixProject do
         native/djot_nif/src
         native/djot_nif/.cargo
         native/djot_nif/Cargo.*
+        checksum-*.exs
         mix.exs
         README.md
         LICENSE
@@ -43,7 +47,8 @@ defmodule Djot.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.32"},
+      {:rustler, ">= 0.32.0", optional: not (@dev? or @force_build?)},
+      {:rustler_precompiled, "~> 0.8"},
       {:ex_doc, "~> 0.34.2", only: :dev, runtime: false}
     ]
   end
