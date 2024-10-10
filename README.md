@@ -69,3 +69,11 @@ def deps do
   {:djot, "~> 0.1.0"}
 ]
 ```
+
+## See Also
+
+If you want something that runs on _pure BEAM_ code, checkout [jot](https://hex.pm/packages/jot), written in Gleam.
+
+This package is inspired by the excellent [mdex](https://hex.pm/packages/mdex) package.
+
+There is no syntax highlighting out of the box with this package. If you want server-side highlighting, I recommend [autumn](https://hex.pm/packages/autumn).

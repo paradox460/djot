@@ -1,0 +1,22 @@
+#!/usr/bin/env fish
+#MISE description="Release a new version based off current version in mix.exs"
+#MISE depends=["tag"]
+
+# Wait here for release to finish
+echo "Waiting for runs to complete and report success"
+set -l run_id (gh run list -w .github/workflows/release.yaml --json databaseId -L 1 | jq -r '.[] | .databaseId')
+while true
+  gh run view --json status,conclusion $run_id | jq -r '.[] | (.status, .conclusion)' | read -l -L run_conclusion run_status
+  if test $run_status == "completed"
+    if test $run_conclusion == "success"
+      break
+    else
+      echo "Run failed with status $run_status" >&2
+      gh run view $run_id >&2
+      exit 1
+    end
+  end
+  sleep 30
+end
+
+mise run publish

@@ -1,0 +1,15 @@
+#!/usr/bin/env fish
+#MISE description="Creates a new git tag based off the current version in mix.exs"
+set -l current_version (string match -gr '@version "(.*?)"' -- (cat mix.exs))
+
+if git rev-parse v$current_version &> /dev/null
+  echo "Current version is already released: v$current_version."
+  read --prompt-str="Overwrite? [yN] " -n 1 -l response
+  if test $response != 'y'
+    exit 1
+  end
+end
+
+git tag -asf v$current_version
+
+git push --follow-tags

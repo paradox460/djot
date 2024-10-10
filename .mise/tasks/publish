@@ -1,0 +1,5 @@
+#!/usr/bin/env fish
+#MISE description="Downloads precompiled versions and publishes to hex"
+mix rustler_precompiled.download Djot.Native --all --print
+
+mix hex.publish

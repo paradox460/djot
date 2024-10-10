@@ -26,7 +26,8 @@ defmodule Djot.MixProject do
       maintainers: ["Jeff Sandberg"],
       licenses: ["MIT"],
       links: %{
-        GitHub: @source_url
+        GitHub: @source_url,
+        Djot: "https://djot.net",
       },
       files: ~w[
         lib
