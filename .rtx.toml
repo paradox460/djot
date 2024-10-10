@@ -1,4 +1,0 @@
-[tools]
-elixir = "1.15.7-otp-26"
-erlang = "26.1.2"
-rust = "1.73.0"

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: jdx/rtx-action@v1
+      - uses: jdx/mise-action@v2
       - name: Deps Cache
         id: deps-cache
         uses: actions/cache@v3
@@ -22,8 +22,8 @@ jobs:
             deps
             _build
             .mix/archives/
-          key: test-${{hashFiles('.rtx.toml')}}-${{hashFiles('mix.lock')}}
-          restore-keys: test-${{hashFiles('.rtx.toml')}}-
+          key: test-${{hashFiles('.mise.toml')}}-${{hashFiles('mix.lock')}}
+          restore-keys: test-${{hashFiles('.mise.toml')}}-
       - name: Install Dependencies
         run: |
           mix local.hex --force --if-missing
