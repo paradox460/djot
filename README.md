@@ -41,6 +41,24 @@ $$`
 
 This can be useful when paired with tools such as the [Tableau SSG](https://github.com/elixir-tools/tableau)
 
+### Options
+
+The Djot renderer accepts a few options:
+
+| Option                 | Values                               | Description                                                              |
+| ---------------------- | ------------------------------------ | ------------------------------------------------------------------------ |
+| `renderer`             | `:default`, `:minified`, `:indented` | Which particular output renderer to use                                  |
+| `indent_string`        | String                               | String which is used to indent lines when using the `:indented` renderer |
+| `indent_initial_level` | Integer                              | How deep the initial indent starts at                                    |
+
+These are passed to the `Djot.to_html` calls as follows:
+
+```elixir
+Djot.to_html(document, renderer: :indented, indent_string: "    ", initial_indent_level: 1)
+```
+
+If you are using the bang variant of `to_html/2`, substitute it where appropriate
+
 ## Installation
 
 Add `:djot` as a dependency:
