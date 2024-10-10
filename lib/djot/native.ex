@@ -11,6 +11,7 @@ defmodule Djot.Native do
       base_url: "#{github_url}/releases/download/v#{version}",
       force_build: force_build,
       mode: mode,
+      targets: Enum.uniq(["aarch64-unknown-linux-musl" | RustlerPrecompiled.Config.default_targets()]),
       version: version
 
   def to_html(_dj, _options), do: :erlang.nif_error(:nif_not_loaded)
