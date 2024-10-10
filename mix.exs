@@ -44,7 +44,7 @@ defmodule Djot.MixProject do
   defp deps do
     [
       {:rustler, "~> 0.32"},
-      {:ex_doc, "~> 0.30.9", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.34.2", only: :dev, runtime: false}
     ]
   end
 end
