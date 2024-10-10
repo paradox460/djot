@@ -2,14 +2,9 @@ name: Build and release NIFs
 
 on:
   push:
-    branches: main
     tags:
       - 'v*'
   workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.sha }}
-  cancel-in-progress: true
 
 jobs:
   build_release:
