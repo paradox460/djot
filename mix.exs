@@ -2,7 +2,7 @@ defmodule Djot.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/paradox460/djot"
-  @version "0.1.4"
+  @version "0.1.5"
   @dev? String.ends_with?(@version, "-dev")
   @force_build? System.get_env("DJOT_BUILD") in ~w[1 true]
 

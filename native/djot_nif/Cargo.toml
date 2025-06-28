@@ -1,6 +1,5 @@
 [package]
 name = "djot_nif"
-version = "0.2.0"
 authors = ["Jeff Sandberg"]
 edition = "2021"
 
@@ -10,5 +9,5 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-jotdown = "0.6.0"
+jotdown = "0.8.0"
 rustler = "0.34.0"
