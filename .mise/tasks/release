@@ -6,7 +6,7 @@
 echo "Waiting for runs to complete and report success"
 set -l run_id (gh run list -w .github/workflows/release.yaml --json databaseId -L 1 | jq -r '.[] | .databaseId')
 while true
-  gh run view --json status,conclusion $run_id | jq -r '.[] | (.status, .conclusion)' | read -l -L run_conclusion run_status
+  gh run view --json status,conclusion $run_id | jq -r '(.status, .conclusion)' | read -l -L run_conclusion run_status
   if test $run_status == "completed"
     if test $run_conclusion == "success"
       break
