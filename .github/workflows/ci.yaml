@@ -10,16 +10,12 @@ on:
 jobs:
   ci:
     name: "CI"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
         env:
-          MISE_ENV: ci
-      - uses: erlef/setup-beam@v1
-        with:
-          version-file: .tool-versions
-          version-type: strict
+          ImageOS: ubuntu-24.04
       - name: Deps Cache
         id: deps-cache
         uses: actions/cache@v4
@@ -28,8 +24,8 @@ jobs:
             deps
             _build
             .mix/archives/
-          key: test-${{hashFiles('.tool-versions')}}-${{hashFiles('mix.lock')}}
-          restore-keys: test-${{hashFiles('.tool-versions')}}-
+          key: test-${{hashFiles('.mise.toml')}}-${{hashFiles('mix.lock')}}
+          restore-keys: test-${{hashFiles('.mise.toml')}}-
       - name: Install Dependencies
         run: |
           mix local.hex --force --if-missing
