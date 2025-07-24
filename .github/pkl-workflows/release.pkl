@@ -47,12 +47,12 @@ jobs {
           }
           (job_matrix) {
             target = "x86_64-pc-windows-gnu"
-            os = "windows-2019"
+            os = "windows-2022"
             `use-cross` = null
           }
           (job_matrix) {
             target = "x86_64-pc-windows-msvc"
-            os = "windows-2019"
+            os = "windows-2022"
             `use-cross` = null
           }
         }
