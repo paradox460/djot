@@ -1,0 +1,43 @@
+amends "https://cdn.jsdelivr.net/gh/StefMa/pkl-gha@77880b64db1f3bf24b31a359311a6f7ef64bffaa/Workflow.pkl"
+import "https://cdn.jsdelivr.net/gh/StefMa/pkl-gha@77880b64db1f3bf24b31a359311a6f7ef64bffaa/Action.pkl"
+
+import "https://cdn.jsdelivr.net/gh/paradox460/shared-pkl@0c33020a8e18437752765a0483aeefbf3bb03fe5/gha/mise.pkl"
+import "https://cdn.jsdelivr.net/gh/paradox460/shared-pkl@0c33020a8e18437752765a0483aeefbf3bb03fe5/gha/elixir.pkl"
+
+name = "CI"
+
+on {
+  pull_request {
+    types = new Listing {"opened" "synchronize"}
+    branches = new Listing { "main" }
+  }
+  push {
+    branches = outer.pull_request.branches
+  }
+  merge_group {}
+  workflow_dispatch {}
+}
+
+jobs {
+  ["ci"] = new {
+    name = "CI"
+    `runs-on` = "ubuntu-24.04"
+    env = new EnvironmentVariables {
+      ["MIX_ENV"] = "test"
+    }
+    steps {
+      Action.checkout
+      (mise.Mise) {
+        miseToml = """
+          [settings]
+          enable_tools = ["elixir", "erlang", "rust"]
+          """
+      }
+      ...elixir.elixir
+      new {
+        name = "Run Tests"
+        run = "mix test --warnings-as-errors"
+      }
+    }
+  }
+}

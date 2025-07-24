@@ -1,0 +1,13 @@
+#!/usr/bin/env fish
+#MISE description="Generates all github workflow files from the pkl files in `.github/pkl-workflows`"
+#MISE tools=["pkl"]
+#MISE sources=[".github/pkl-workflows/**/*.pkl"]
+#MISE outputs=[".github/workflows/*.yml"]
+#USAGE flag "-n --dry-run" help="Do not write files, just print each workflow to stdout"
+
+set -l pkl_output "-o" ".github/workflows/%{moduleName}.yml"
+if set -q usage_dry_run
+  set -e pkl_output
+end
+
+mise exec -- pkl eval .github/pkl-workflows/*.pkl $pkl_output

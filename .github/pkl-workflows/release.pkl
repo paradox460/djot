@@ -1,0 +1,115 @@
+amends "https://cdn.jsdelivr.net/gh/Paradox460/pkl-gha@9a8ef2e658223fd7cb08a68b5a63a44ec6566166/Workflow.pkl"
+import "https://cdn.jsdelivr.net/gh/Paradox460/pkl-gha@9a8ef2e658223fd7cb08a68b5a63a44ec6566166/Action.pkl"
+
+import "https://cdn.jsdelivr.net/gh/paradox460/shared-pkl@0c33020a8e18437752765a0483aeefbf3bb03fe5/gha/mise.pkl"
+
+name = "Build and release NIFs"
+
+on {
+  push {
+    tags = new Listing { "v*" }
+  }
+  workflow_dispatch {}
+}
+
+local job_matrix = new Dynamic {
+  os = "ubuntu-22.04"
+  `use-cross`= true
+}
+
+jobs {
+  ["build_release"] = new {
+    name = "NIF ${{ matrix.nif }} - ${{ matrix.job.target }} (${{ matrix.job.os }})"
+    `runs-on` = "${{ matrix.job.os }}"
+    strategy = new {
+      `fail-fast` = false
+      matrix = new {
+        ["nif"] = new Listing { "2.15" }
+        ["job"] = new Listing {
+          (job_matrix) { target = "arm-unknown-linux-gnueabihf" }
+          (job_matrix) { target = "aarch64-unknown-linux-gnu" }
+          (job_matrix) { target = "aarch64-unknown-linux-musl" }
+          (job_matrix) { target = "riscv64gc-unknown-linux-gnu" }
+          (job_matrix) { target = "x86_64-unknown-linux-musl" }
+          (job_matrix) {
+            target = "aarch64-apple-darwin"
+            os = "macos-13"
+            `use-cross` = null
+          }
+          (job_matrix) {
+            target = "x86_64-apple-darwin"
+            os = "macos-13"
+            `use-cross` = null
+          }
+          (job_matrix) {
+            target = "x86_64-unknown-linux-gnu"
+            `use-cross` = null
+          }
+          (job_matrix) {
+            target = "x86_64-pc-windows-gnu"
+            os = "windows-2019"
+            `use-cross` = null
+          }
+          (job_matrix) {
+            target = "x86_64-pc-windows-msvc"
+            os = "windows-2019"
+            `use-cross` = null
+          }
+        }
+      }
+    }
+    permissions = new {
+      contents = "write"
+      `id-token` = "write"
+      attestations = "write"
+    }
+    steps {
+      Action.checkout
+      new {
+        name = "Extract Project Version"
+        shell = "bash"
+        run = #"echo "PROJECT_VERSION=$(sed -n 's/^  @version "\(.*\)"/\1/p' mix.exs | head -n1)" >> $GITHUB_ENV"#
+      }
+      new {
+        name = "Install rust toolchain"
+        uses = "dtolnay/rust-toolchain@stable"
+        with {
+          ["toolchain"] = "stable"
+          ["target"] = "${{ matrix.job.target }}"
+        }
+      }
+      new {
+        name = "Build"
+        id = "build-crate"
+        uses = "philss/rustler-precompiled-action@v1.1.4"
+        with {
+          ["project-name"] = "djot_nif"
+          ["project-version"] = "${{ env.PROJECT_VERSION }}"
+          ["target"] = "${{ matrix.job.target }}"
+          ["nif-version"] = "${{ matrix.nif }}"
+          ["use-cross"] = "${{ matrix.job.use-cross }}"
+          ["project-dir"] = "native/djot_nif"
+        }
+      }
+      new {
+        name = "Artifact attestation"
+        uses = "actions/attest-build-provenance@v1"
+        with {
+          ["subject-path"] = "${{ steps.build-crate.outputs.file-path }}"
+        }
+      }
+      (Action.uploadArtitact) {
+        name = "${{ steps.build-crate.outputs.file-name }}"
+        path = "${{ steps.build-crate.outputs.file-path }}"
+      }
+      new {
+        name = "Publish archives and packages"
+        uses = "softprops/action-gh-release@v2"
+        with {
+          ["files"] = "${{ steps.build-crate.outputs.file-path }}"
+        }
+        `if` = "startsWith(github.ref, 'refs/tags/')"
+      }
+    }
+  }
+}

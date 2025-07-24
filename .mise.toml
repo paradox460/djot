@@ -3,3 +3,7 @@ min_version = "2025.6.8"
 elixir = "1.18.4-otp-28"
 rust = "1.88.0"
 erlang = "28.0.1"
+pkl = "latest"
+
+[settings]
+lockfile = true

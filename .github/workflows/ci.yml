@@ -1,0 +1,45 @@
+# Do not modify!
+# This file was generated from a template using https://github.com/StefMa/pkl-gha
+
+name: CI
+'on':
+  merge_group: {}
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    branches:
+    - main
+  push:
+    branches:
+    - main
+  workflow_dispatch: {}
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: test
+    steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+      with:
+        mise_toml: |-
+          [settings]
+          enable_tools = ["elixir", "erlang", "rust"]
+    - name: Elixir Deps cache
+      id: elixir-deps-cache
+      uses: actions/cache@v4
+      with:
+        path: |-
+          deps
+          _build
+          .mix/archives/
+        key: elixir-build-${{hashFiles('.mise.lock')}}-${{hashFiles('mix.lock')}}
+        restore-keys: elixir-build-${{hashFiles('.mise.lock')}}-
+    - name: Install Elixir Dependencies
+      run: |-
+        mix local.hex --force --if-missing
+        mix deps.get
+    - name: Run Tests
+      run: mix test --warnings-as-errors
