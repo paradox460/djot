@@ -17,6 +17,7 @@ defmodule Djot.MixProject do
       name: "Djot",
       description: "A Djot markup language parser and formatter",
       deps: deps(),
+      docs: docs(),
       package: package()
     ]
   end
@@ -27,7 +28,7 @@ defmodule Djot.MixProject do
       licenses: ["MIT"],
       links: %{
         GitHub: @source_url,
-        Djot: "https://djot.net",
+        Djot: "https://djot.net"
       },
       files: ~w[
         lib
@@ -48,9 +49,18 @@ defmodule Djot.MixProject do
 
   defp deps do
     [
-      {:rustler, ">= 0.32.0", optional: not (@dev? or @force_build?)},
-      {:rustler_precompiled, "~> 0.8"},
-      {:ex_doc, "~> 0.34.2", only: :dev, runtime: false}
+      {:rustler, "~> 0.38", optional: not (@dev? or @force_build?)},
+      {:rustler_precompiled, "~> 0.9"},
+      {:ex_doc, "~> 0.40", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"],
+      source_ref: "v#{@version}",
+      source_url: @source_url
     ]
   end
 end
