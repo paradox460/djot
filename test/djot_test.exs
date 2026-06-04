@@ -76,4 +76,17 @@ defmodule DjotTest do
       assert {:ok, "<p>Hello World</p>"} = Djot.to_html("Hello World", %{renderer: :minified})
     end
   end
+
+  describe "with the bang variant" do
+    test "returns raw html string on success" do
+      assert "<p>Hello <strong>world</strong>!</p>\n" = Djot.to_html!("Hello *world*!")
+    end
+  end
+
+  describe "sigil" do
+    test "~d compiles at runtime" do
+      import Djot.Sigil
+      assert ~d"Hello *world*!" == "<p>Hello <strong>world</strong>!</p>\n"
+    end
+  end
 end
