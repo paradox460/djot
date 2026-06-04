@@ -23,16 +23,16 @@ pub fn to_html<'a>(env: Env<'a>, dj: &str, options: DjotOptions) -> Result<Term<
     let events = jotdown::Parser::new(dj);
     let mut html = String::new();
 
-    let renderer = match options.renderer {
+    let mut renderer = match options.renderer {
         options::DjotRenderer::Default => Renderer::default(),
         options::DjotRenderer::Minified => Renderer::minified(),
         options::DjotRenderer::Indented => Renderer::indented(Indentation {
-            string: options.indent_string.unwrap_or("\t".to_string()),
+            string: options.indent_string.unwrap_or_else(|| "\t".to_string()),
             initial_level: options.indent_initial_level.unwrap_or(0),
         }),
     };
 
-    match renderer.push(events, &mut html) {
+    match renderer.push_events(events, &mut html) {
         Ok(()) => Ok((ok(), html).encode(env)),
         Err(_e) => Err(RustlerError::Term(Box::new(djot_transform()))),
     }

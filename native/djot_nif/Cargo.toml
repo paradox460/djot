@@ -1,7 +1,12 @@
 [package]
 name = "djot_nif"
+version = "0.1.5"
 authors = ["Jeff Sandberg"]
+license = "MIT"
+description = "Rust NIF for Djot, a Djot-to-HTML renderer"
+repository = "https://github.com/paradox460/djot"
 edition = "2021"
+rust-version = "1.91"
 
 [lib]
 name = "djot_nif"
@@ -9,5 +14,5 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-jotdown = "0.8.0"
-rustler = "0.34.0"
+jotdown = "0.10.0"
+rustler = "0.38.0"
