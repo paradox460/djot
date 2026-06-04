@@ -1,20 +1,23 @@
-# NIF for Elixir.Djot.Native
+# Djot NIF (Rustler Precompiled)
 
-## To build the NIF module:
-
-- Your NIF will now build along with your project.
-
-## To load the NIF:
+This crate implements the native implementation for the `Djot` library via a Rust
+NIF compiled with Rustler‑Precompiled. It is loaded in Elixir through the module
+`Djot.Native`:
 
 ```elixir
 defmodule Djot.Native do
-  use Rustler, otp_app: :djot, crate: "djot_nif"
-
-  # When your NIF is loaded, it will override this function.
-  def add(_a, _b), do: :erlang.nif_error(:nif_not_loaded)
+  use RustlerPrecompiled,
+    otp_app: :djot,
+    crate: "djot_nif"
 end
 ```
 
-## Examples
+The only public NIF function is `to_html/2`, which takes a Djot markup string and
+an options struct (`Djot.Options` in Elixir) and returns either `{:ok, html}` or
+`{:error, :djot_transform}` on failure.
 
-[This](https://github.com/rusterlium/NifIo) is a complete example of a NIF written in Rust.
+Building the NIF is handled automatically by `mix compile`; in development and
+test environments the crate will be built from source, while in production a
+pre‑compiled binary is downloaded from the GitHub releases.
+
+Refer to the top‑level `README.md` for usage examples.

@@ -68,6 +68,7 @@ def deps do
 [
   {:djot, "~> 0.1.0"}
 ]
+end
 ```
 
 ## See Also
