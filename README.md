@@ -202,7 +202,7 @@ steps run on every emitted block document (see the `:stream` private key above).
 ```elixir
 def deps do
   [
-    {:djot, "~> 0.1.0"}
+    {:djot, "~> 1.0"}
   ]
 end
 ```
