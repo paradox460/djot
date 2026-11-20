@@ -1,0 +1,55 @@
+/// Precompiles Rustler projects and outputs files in the expected filenames.
+module philss.`rustler-precompiled-action`.`v1.1.5`.RustlerPrecompiledAction
+
+extends "@com.github.actions/AbstractTypedStep.pkl"
+
+fixed action: "philss/rustler-precompiled-action"
+
+fixed version: "v1.1.5"
+
+with: With?
+
+class With {
+  /// Name of the crate that is being built. This is the same of the Cargo.toml of the crate.
+  `project-name`: String|Boolean|Number
+
+  /// The version to use in the name of the lib. This mostly matches the Elixir package version.
+  `project-version`: String|Boolean|Number
+
+  /// The version desired for cross, the tool that builds for multiple plataforms. It's possible to specify a version, or the string "from-source" to install from the main branch of the project repository.
+  ///
+  /// Default if unspecified: `"v0.2.4"`
+  `cross-version`: (String|Boolean|Number)?
+
+  /// If the target requires the usage of cross.
+  ///
+  /// Default if unspecified: `false`
+  `use-cross`: (String|Boolean|Number)?
+
+  /// The Rust target we are building to.
+  target: String|Boolean|Number
+
+  /// The NIF version that we are aiming to.
+  ///
+  /// Default if unspecified: `"2.16"`
+  `nif-version`: (String|Boolean|Number)?
+
+  /// A relative path where the project is located. The script is going to enter this path in order to compile the NIF. For example, "native/my_nif".
+  ///
+  /// Default if unspecified: `"./"`
+  `project-dir`: (String|Boolean|Number)?
+
+  /// An alternative version for a given target that is useful when you are building for the same target, but with different dependencies, or hardware capatibilities.
+  /// This name should be a valid string that can be represented as an Elixir atom.
+  /// Prefer to use only alphanumerics and underscores. This is going to be appended to the artifact name.
+  ///
+  /// Default if unspecified: `""`
+  variant: (String|Boolean|Number)?
+
+  /// A string with additional arguments to be appended to the build command. This is useful to pass flags like `--features`.
+  /// Notice that the flags `--release` and `--target` are going to be passed down automatically.
+  /// The flag `--features` may be passed, depending of the NIF version. But you can always pass this flag multiple times.
+  ///
+  /// Default if unspecified: `""`
+  `cargo-args`: (String|Boolean|Number)?
+}

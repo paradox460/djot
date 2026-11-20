@@ -1,0 +1,87 @@
+amends "@com.github.actions/Workflow.pkl"
+
+import "catalog.pkl"
+
+name = "CI"
+
+on {
+  pull_request {
+    branches { "main" }
+  }
+  push {
+    branches { "main" }
+  }
+  merge_group {}
+  workflow_dispatch {}
+}
+
+permissions {
+  contents = "read"
+}
+
+// Pull requests share a group per branch and cancel superseded runs; other events get a
+// unique group (run_id) so pushes to main always finish.
+concurrency {
+  group = "${{ github.workflow }}-${{ github.head_ref || github.run_id }}"
+  `cancel-in-progress` = true
+}
+
+jobs {
+  ["test"] {
+    name = "Test"
+    `runs-on` = "ubuntu-24.04"
+    env {
+      ["MIX_ENV"] = "test"
+      ["MISE_ENABLE_TOOLS"] = "elixir,erlang,rust"
+    }
+    steps {
+      catalog.`actions/checkout@v7`
+      catalog.`jdx/mise-action@v5`
+      (catalog.`actions/cache@v6`) {
+        name = "Cache Elixir deps and build"
+        with {
+          pathList {
+            "deps"
+            "_build"
+            "native/djot_nif/target"
+          }
+          key = "elixir-build-${{ hashFiles('mise.lock') }}-${{ hashFiles('mix.lock', 'native/djot_nif/Cargo.lock') }}"
+          `restore-keys` = "elixir-build-${{ hashFiles('mise.lock') }}-"
+        }
+      }
+      new {
+        name = "Install Elixir dependencies"
+        run = "mix deps.get"
+      }
+      new {
+        name = "Check formatting"
+        run = """
+          mix format --check-formatted
+          cargo fmt --manifest-path native/djot_nif/Cargo.toml --check
+          """
+      }
+      new {
+        name = "Clippy"
+        run = "cargo clippy --manifest-path native/djot_nif/Cargo.toml -- -D warnings"
+      }
+      new {
+        name = "Run tests"
+        run = "mix test --warnings-as-errors"
+      }
+    }
+  }
+  ["workflows"] {
+    name = "Generated workflows are up to date"
+    `runs-on` = "ubuntu-24.04"
+    env {
+      ["MISE_ENABLE_TOOLS"] = "pkl"
+    }
+    steps {
+      catalog.`actions/checkout@v7`
+      catalog.`jdx/mise-action@v5`
+      new {
+        run = "mise run check-workflows"
+      }
+    }
+  }
+}

@@ -44,11 +44,11 @@ fn attrs_to_ex(attrs: &Attributes) -> Attrs {
 }
 
 fn push_child(children: &mut Vec<Node>, node: Node) {
-    if let Node::Text(ExText { literal }) = &node {
-        if let Some(Node::Text(prev)) = children.last_mut() {
-            prev.literal.push_str(literal);
-            return;
-        }
+    if let Node::Text(ExText { literal }) = &node
+        && let Some(Node::Text(prev)) = children.last_mut()
+    {
+        prev.literal.push_str(literal);
+        return;
     }
     children.push(node);
 }

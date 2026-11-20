@@ -5,11 +5,13 @@ set -l current_version (string match -gr '@version "(.*?)"' -- (cat mix.exs))
 if git rev-parse v$current_version &> /dev/null
   echo "Current version is already released: v$current_version."
   read --prompt-str="Overwrite? [yN] " -n 1 -l response
-  if test $response != 'y'
+  if test "$response" != 'y'
     exit 1
   end
 end
 
 git tag -asf v$current_version
 
-git push --follow-tags
+# Push only the tag (with jj the git HEAD is usually detached). --force matches the
+# `git tag -f` above so a confirmed overwrite also replaces the remote tag.
+git push --force origin refs/tags/v$current_version

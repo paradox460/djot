@@ -5,7 +5,7 @@ authors = ["Jeff Sandberg"]
 license = "MIT"
 description = "Rust NIF for Djot, a Djot-to-HTML renderer"
 repository = "https://github.com/paradox460/djot"
-edition = "2021"
+edition = "2024"
 rust-version = "1.91"
 
 [lib]

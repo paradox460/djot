@@ -1,0 +1,28 @@
+/// Entry point for all generated GitHub configuration.
+///
+/// Regenerate with `mise run update-workflows`; never edit the YAML in `workflows/` by hand.
+/// Actions are pinned to commit SHAs through `workflows/__lockfile__.yml`, which Dependabot
+/// keeps up to date.
+amends "@pkl.github.dependabotManagedActions/DependabotManagedActions.pkl"
+
+workflows {
+  ["workflows/ci.yml"] = import("ci.pkl")
+  ["workflows/release.yml"] = import("release.pkl")
+}
+
+dependabot {
+  updates {
+    new {
+      `package-ecosystem` = "mix"
+      directory = "/"
+      schedule { interval = "weekly" }
+      cooldown { `default-days` = 7 }
+    }
+    new {
+      `package-ecosystem` = "cargo"
+      directory = "/native/djot_nif"
+      schedule { interval = "weekly" }
+      cooldown { `default-days` = 7 }
+    }
+  }
+}

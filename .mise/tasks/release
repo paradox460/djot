@@ -1,22 +1,17 @@
 #!/usr/bin/env fish
-#MISE description="Release a new version based off current version in mix.exs"
+#MISE description="Tag the version in mix.exs, wait for the NIF release build, then publish to Hex"
 #MISE depends=["tag"]
 
-# Wait here for release to finish
-echo "Waiting for runs to complete and report success"
-set -l run_id (gh run list -w .github/workflows/release.yaml --json databaseId -L 1 | jq -r '.[] | .databaseId')
-while true
-  gh run view --json status,conclusion $run_id | jq -r '(.status, .conclusion)' | read -l -L run_conclusion run_status
-  if test $run_status == "completed"
-    if test $run_conclusion == "success"
-      break
-    else
-      echo "Run failed with status $run_status" >&2
-      gh run view $run_id >&2
-      exit 1
-    end
-  end
-  sleep 30
+set -l current_version (string match -gr '@version "(.*?)"' -- (cat mix.exs))
+set -l sha (git rev-list -n 1 v$current_version)
+
+echo "Waiting for the release workflow run for v$current_version ($sha)"
+set -l run_id
+while test -z "$run_id"
+  set run_id (gh run list --workflow release.yml --commit $sha --event push --json databaseId --jq '.[0].databaseId')
+  test -z "$run_id"; and sleep 10
 end
+
+gh run watch $run_id --exit-status; or exit 1
 
 mise run publish

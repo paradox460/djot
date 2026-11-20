@@ -1,0 +1,195 @@
+/// Actions for working with mise runtime manager
+module jdx.`mise-action`.v5.MiseAction
+
+extends "@com.github.actions/AbstractTypedStep.pkl"
+
+fixed action: "jdx/mise-action"
+
+fixed version: "v5"
+
+with: With?
+
+class With {
+  /// The version of mise to use. If not specified, uses the newest release satisfying minimum_release_age.
+  version: (String|Boolean|Number)?
+
+  /// When `version` is unset, reinstall a cached mise if a newer release is available. By default a cached mise is kept until the cache key changes.
+  ///
+  /// Default if unspecified: `"false"`
+  auto_update: (String|Boolean|Number)?
+
+  /// When version is not specified, only install stable mise releases older than this threshold. Defaults to 24h; set 0s to disable the delay.
+  /// Accepts relative durations such as 24h, 7d, 6mo, or 1y, and absolute ISO dates or timestamps.
+  ///
+  /// Default if unspecified: `"24h"`
+  minimum_release_age: (String|Boolean|Number)?
+
+  /// The SHA256 checksum of the mise binary to verify the download.
+  sha256: (String|Boolean|Number)?
+
+  /// The directory that mise will be installed to, defaults to $HOME/.local/share/mise
+  /// Or $XDG_DATA_HOME/mise if $XDG_DATA_HOME is set.
+  /// Or $MISE_DATA_DIR if $MISE_DATA_DIR is set.
+  /// When set, the action also exports it as MISE_DATA_DIR (overriding any existing value) so tools install into the cached directory. mise's state directory is not moved; set MISE_STATE_DIR for that.
+  mise_dir: (String|Boolean|Number)?
+
+  /// If present, this value will be written to the .tool-versions file
+  tool_versions: (String|Boolean|Number)?
+
+  /// If present, this value will be written to the mise.toml file
+  mise_toml: (String|Boolean|Number)?
+
+  /// if false, will not run `mise install` or `mise bootstrap`
+  ///
+  /// Default if unspecified: `"true"`
+  install: (String|Boolean|Number)?
+
+  /// Plugins to install before tools, one per line as `name` or `name url`, e.g. `yarn` or `php https://github.com/verzly/mise-php#latest`. Useful for idiomatic version files (such as .yvmrc) that need a plugin.
+  ///
+  /// Default if unspecified: `""`
+  plugins: (String|Boolean|Number)?
+
+  /// Arguments to pass to `mise install` such as "bun" to only install bun. When a repo mise lock file is present, the action automatically adds `--locked` unless you already provided it.
+  install_args: (String|Boolean|Number)?
+
+  /// Automatically pass `--monorepo` to `mise install` when the mise configuration has `monorepo.config_roots`. Set to false to opt out.
+  ///
+  /// Default if unspecified: `"true"`
+  monorepo: (String|Boolean|Number)?
+
+  /// if true, will run `mise bootstrap` instead of `mise install`
+  ///
+  /// Default if unspecified: `"false"`
+  bootstrap: (String|Boolean|Number)?
+
+  /// Comma-separated bootstrap parts to skip, such as "tools,task". Passed as `mise bootstrap --skip`.
+  bootstrap_skip: (String|Boolean|Number)?
+
+  /// Additional arguments to pass to `mise bootstrap`.
+  bootstrap_args: (String|Boolean|Number)?
+
+  /// deprecated
+  install_dir: (String|Boolean|Number)?
+
+  /// if false, action will not read or write to cache
+  ///
+  /// Default if unspecified: `"true"`
+  cache: (String|Boolean|Number)?
+
+  /// if false, action will not write to cache
+  ///
+  /// Default if unspecified: `"true"`
+  cache_save: (String|Boolean|Number)?
+
+  /// if true, save the cache in the post step instead of right after install, so tools installed by later steps (e.g. monorepo sub-projects or task tools) are included. Only applies on a cache miss. The post step runs even if a later step fails, as the immediate save would have.
+  ///
+  /// Default if unspecified: `"false"`
+  cache_save_post: (String|Boolean|Number)?
+
+  /// Total time to keep retrying a cache restore that GitHub throttles with HTTP 429, as a duration like `60s`. Each wait is at least the advertised Retry-After plus up to 2s of jitter and counts against the budget. `0s` disables retries. A cache miss is never retried.
+  ///
+  /// Default if unspecified: `"0s"`
+  cache_restore_retry_budget: (String|Boolean|Number)?
+
+  /// Total time to keep retrying a cache save that GitHub throttles with HTTP 429, as a duration like `60s`. Each wait is at least the advertised Retry-After plus up to 2s of jitter and counts against the budget. `0s` disables retries. A reservation conflict (another job is saving the same key) is never retried.
+  ///
+  /// Default if unspecified: `"0s"`
+  cache_save_retry_budget: (String|Boolean|Number)?
+
+  /// The prefix key to use for the cache, change this to invalidate the cache
+  ///
+  /// Default if unspecified: `"mise-v1"`
+  cache_key_prefix: (String|Boolean|Number)?
+
+  /// Rebuild the cache from scratch at least this often, so a frequently used cache still picks up the latest mise and tools. Adds a period number to the default cache key. Set 0 to disable.
+  ///
+  /// Default if unspecified: `"30"`
+  cache_max_age_days: (String|Boolean|Number)?
+
+  /// Override the complete cache key (ignores all other cache key options).
+  /// Supports template variables: {{version}}, {{cache_key_prefix}}, {{platform}}, {{file_hash}},
+  /// {{mise_env}}, {{install_args_hash}}, {{bootstrap_hash}}, {{cache_period}}, {{default}}, {{env.VAR_NAME}} for environment variables,
+  /// and conditional logic like {{#if version}}...{{/if}}
+  cache_key: (String|Boolean|Number)?
+
+  /// if true, will use experimental features
+  ///
+  /// Default if unspecified: `"false"`
+  experimental: (String|Boolean|Number)?
+
+  /// The log level to use for the action
+  ///
+  /// Default if unspecified: `"info"`
+  log_level: (String|Boolean|Number)?
+
+  /// The directory that mise runs in
+  working_directory: (String|Boolean|Number)?
+
+  /// if true, will run `mise reshim --all` after setting up mise
+  ///
+  /// Default if unspecified: `"false"`
+  reshim: (String|Boolean|Number)?
+
+  /// if false, will not add mise shims directory to PATH
+  ///
+  /// Default if unspecified: `"true"`
+  add_shims_to_path: (String|Boolean|Number)?
+
+  /// GitHub token for API authentication to avoid rate limits when installing GitHub-hosted tools.
+  /// Defaults to the automatic GitHub token. Used only during this action unless persist_github_token is set.
+  ///
+  /// Default if unspecified: `"${{ github.token }}"`
+  github_token: (String|Boolean|Number)?
+
+  /// Persist MISE_GITHUB_TOKEN for subsequent steps. false (default) keeps github_token local to this action.
+  /// true exports the token used by this action (env.MISE_GITHUB_TOKEN takes precedence over github_token).
+  /// A token value exports that credential instead, while this action continues to use github_token or env.MISE_GITHUB_TOKEN.
+  ///
+  /// Default if unspecified: `"false"`
+  persist_github_token: (String|Boolean|Number)?
+
+  /// If true (default), fetch the mise binary from GitHub, falling back to mise.jdx.dev when the latest version is requested and the GitHub download fails. If false and using the latest version, fetch from mise.jdx.dev first and fall back to GitHub. A pinned version is only ever fetched from GitHub. Downloads are verified against the signed checksums either way.
+  ///
+  /// Default if unspecified: `"true"`
+  fetch_from_github: (String|Boolean|Number)?
+
+  /// Automatically load mise environment variables for subsequent steps.
+  ///
+  /// Default if unspecified: `"true"`
+  env: (String|Boolean|Number)?
+
+  /// Add PATH entries produced by mise, including [env] _.path, to subsequent steps through GITHUB_PATH.
+  ///
+  /// Default if unspecified: `"true"`
+  export_path: (String|Boolean|Number)?
+
+  /// [experimental] Opt in to the mise-wings asset cache
+  /// (https://mise-wings.en.dev) for this action invocation.
+  ///
+  /// When `true`, the action exports `MISE_WINGS_ENABLED=1` so
+  /// the installed mise binary routes tool-install URLs (npm
+  /// tarballs, GitHub release artifacts) through the per-org
+  /// wings cache subdomains.
+  ///
+  /// Authentication is automatic via the runner's GitHub OIDC
+  /// identity — no `mise wings login` step, no long-lived
+  /// secret to rotate. The workflow must declare
+  /// `permissions: id-token: write` so the OIDC token-issuer
+  /// env vars are populated; without that, mise falls through
+  /// to direct-origin fetches transparently.
+  ///
+  /// Default `false` is the conservative posture: a workflow
+  /// with `id-token: write` (used for SLSA / AWS-OIDC /
+  /// Sigstore / etc.) should not have its OIDC token sent to
+  /// a third-party cache without explicit opt-in. Older mise
+  /// binaries that don't speak wings ignore the env var
+  /// entirely, so this is forward-compatible.
+  ///
+  /// Requires an active mise-wings subscription on the Clerk
+  /// org linked to the GitHub org running the workflow;
+  /// without one, the proxy 402s and mise leaves the cache
+  /// off without affecting the workflow's success.
+  ///
+  /// Default if unspecified: `"false"`
+  wings_enabled: (String|Boolean|Number)?
+}

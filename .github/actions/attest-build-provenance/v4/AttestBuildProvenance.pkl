@@ -1,0 +1,53 @@
+/// Generate provenance attestations for build artifacts
+module actions.`attest-build-provenance`.v4.AttestBuildProvenance
+
+extends "@com.github.actions/AbstractTypedStep.pkl"
+
+fixed action: "actions/attest-build-provenance"
+
+fixed version: "v4"
+
+with: With?
+
+class With {
+  /// Path to the artifact serving as the subject of the attestation. Must specify exactly one of "subject-path", "subject-digest", or "subject-checksums". May contain a glob pattern or list of paths (total subject count cannot exceed 1024).
+  `subject-path`: (String|Boolean|Number)?
+
+  /// Digest of the subject for which provenance will be generated. Must be in the form "algorithm:hex_digest" (e.g. "sha256:abc123..."). Must specify exactly one of "subject-path", "subject-digest", or "subject-checksums".
+  `subject-digest`: (String|Boolean|Number)?
+
+  /// Subject name as it should appear in the attestation. Required when identifying the subject with the "subject-digest" input.
+  `subject-name`: (String|Boolean|Number)?
+
+  /// Path to checksums file containing digest and name of subjects for attestation. Must specify exactly one of "subject-path", "subject-digest", or "subject-checksums".
+  `subject-checksums`: (String|Boolean|Number)?
+
+  /// URI identifying the type of the predicate. Required when using "predicate" or "predicate-path" for custom attestations.
+  `predicate-type`: (String|Boolean|Number)?
+
+  /// String containing the value for the attestation predicate. String length cannot exceed 16MB. Must supply exactly one of "predicate-path" or "predicate" when creating custom attestations.
+  predicate: (String|Boolean|Number)?
+
+  /// Path to the file which contains the content for the attestation predicate. File size cannot exceed 16MB. Must supply exactly one of "predicate-path" or "predicate" when creating custom attestations.
+  `predicate-path`: (String|Boolean|Number)?
+
+  /// Whether to push the provenance statement to the image registry. Requires that the "subject-name" parameter specify the fully-qualified image name and that the "subject-digest" parameter be specified. Defaults to false.
+  ///
+  /// Default if unspecified: `false`
+  `push-to-registry`: (String|Boolean|Number)?
+
+  /// Whether to create a storage record for the artifact. Requires that push-to-registry is set to true. Defaults to true.
+  ///
+  /// Default if unspecified: `true`
+  `create-storage-record`: (String|Boolean|Number)?
+
+  /// Whether to attach a list of generated attestations to the workflow run summary page. Defaults to true.
+  ///
+  /// Default if unspecified: `true`
+  `show-summary`: (String|Boolean|Number)?
+
+  /// The GitHub token used to make authenticated API requests.
+  ///
+  /// Default if unspecified: `"${{ github.token }}"`
+  `github-token`: (String|Boolean|Number)?
+}

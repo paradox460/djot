@@ -1,0 +1,27 @@
+min_version = "2025.6.8"
+
+[tools]
+elixir = "1.20.5-otp-29"
+erlang = "29.1.2"
+rust = { version = "1.100", components = ["clippy", "rustfmt"] }
+pkl = "0.33"
+
+[settings]
+lockfile = true
+
+[tasks.update-workflows]
+description = "Generate .github/workflows and .github/dependabot.yml from .github/index.pkl"
+run = "pkl eval --project-dir .github -m .github .github/index.pkl"
+
+[tasks.check-workflows]
+description = "Fail if the generated GitHub files are out of date with the Pkl sources"
+depends = ["update-workflows"]
+# `git status` also catches newly generated files that `git diff` would miss.
+run = '''
+if [ -n "$(git status --porcelain -- .github)" ]; then
+  git status --short -- .github
+  git diff -- .github
+  echo "Generated GitHub files are stale; run 'mise run update-workflows' and commit the result." >&2
+  exit 1
+fi
+'''

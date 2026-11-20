@@ -1,0 +1,34 @@
+/// Upstream catalog plus typed steps for the third-party and newer actions this repo uses.
+///
+/// The extra modules were generated with:
+///
+/// ```
+/// cd .github
+/// pkl eval package://pkg.pkl-lang.org/pkl-pantry/com.github.actions.contrib@1.0.20#/generate-action.pkl \
+///   -m . -p action-name=<owner>/<repo>@<version> -p action-package-name=@com.github.actions
+/// ```
+extends "@com.github.actions/catalog.pkl"
+
+import "actions/attest-build-provenance/v4/AttestBuildProvenance.pkl"
+import "actions/cache/v6/Cache.pkl" as CacheV6
+import "actions/checkout/v7/Checkout.pkl" as CheckoutV7
+import "jdx/mise-action/v5/MiseAction.pkl"
+import "philss/rustler-precompiled-action/v1.1.5/RustlerPrecompiledAction.pkl"
+import "softprops/action-gh-release/v3/ActionGhRelease.pkl"
+
+`actions/attest-build-provenance@v4`: AttestBuildProvenance
+
+`actions/cache@v6`: CacheV6
+
+/// Checkout without persisting the token in `.git/config`.
+`actions/checkout@v7`: CheckoutV7 = new {
+  with {
+    `persist-credentials` = false
+  }
+}
+
+`jdx/mise-action@v5`: MiseAction
+
+`philss/rustler-precompiled-action@v1.1.5`: RustlerPrecompiledAction
+
+`softprops/action-gh-release@v3`: ActionGhRelease

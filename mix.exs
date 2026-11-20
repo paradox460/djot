@@ -10,7 +10,7 @@ defmodule Djot.MixProject do
     [
       app: :djot,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       source_url: @source_url,
       homepage_url: @source_url,
@@ -50,7 +50,7 @@ defmodule Djot.MixProject do
   defp deps do
     [
       {:rustler, "~> 0.38", optional: not (@dev? or @force_build?)},
-      {:rustler_precompiled, "~> 0.9"},
+      {:rustler_precompiled, "~> 0.10"},
       {:nimble_options, "~> 1.1"},
       {:lumis, "~> 0.10", optional: true},
       {:lumis_wasm_elixir, "~> 0.26", only: :test},

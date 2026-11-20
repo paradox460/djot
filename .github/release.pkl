@@ -1,0 +1,103 @@
+amends "@com.github.actions/Workflow.pkl"
+
+import "catalog.pkl"
+
+name = "Build and release NIFs"
+
+on {
+  push {
+    tags { "v*" }
+  }
+  workflow_dispatch {}
+}
+
+permissions {
+  contents = "read"
+}
+
+// rustler-precompiled-action installs cross whenever `use-cross` is a non-empty string
+// (`false` included), so native builds leave it unset.
+local cross = new Dynamic {
+  os = "ubuntu-22.04"
+  `use-cross` = true
+}
+
+jobs {
+  ["build_release"] {
+    name = "NIF ${{ matrix.nif }} - ${{ matrix.job.target }} (${{ matrix.job.os }})"
+    `runs-on` = "${{ matrix.job.os }}"
+    strategy {
+      `fail-fast` = false
+      matrix {
+        // Must match the targets in lib/djot/native.ex (RustlerPrecompiled defaults).
+        ["nif"] { "2.15" }
+        ["job"] {
+          (cross) { target = "arm-unknown-linux-gnueabihf" }
+          (cross) { target = "aarch64-unknown-linux-gnu" }
+          (cross) { target = "aarch64-unknown-linux-musl" }
+          (cross) { target = "riscv64gc-unknown-linux-gnu" }
+          (cross) { target = "x86_64-unknown-linux-musl" }
+          new { target = "x86_64-unknown-linux-gnu"; os = "ubuntu-22.04" }
+          new { target = "aarch64-apple-darwin"; os = "macos-15" }
+          new { target = "x86_64-apple-darwin"; os = "macos-15-intel" }
+          new { target = "x86_64-pc-windows-gnu"; os = "windows-2022" }
+          new { target = "x86_64-pc-windows-msvc"; os = "windows-2022" }
+        }
+      }
+    }
+    permissions {
+      contents = "write"
+      `id-token` = "write"
+      attestations = "write"
+    }
+    steps {
+      catalog.`actions/checkout@v7`
+      new {
+        name = "Extract project version"
+        shell = "bash"
+        run = #"echo "PROJECT_VERSION=$(sed -n 's/^  @version "\(.*\)"/\1/p' mix.exs | head -n1)" >> "$GITHUB_ENV""#
+      }
+      new {
+        name = "Install Rust target"
+        shell = "bash"
+        run = """
+          rustup update stable --no-self-update
+          rustup default stable
+          rustup target add ${{ matrix.job.target }}
+          """
+      }
+      (catalog.`philss/rustler-precompiled-action@v1.1.5`) {
+        name = "Build"
+        id = "build-crate"
+        with {
+          `project-name` = "djot_nif"
+          `project-version` = "${{ env.PROJECT_VERSION }}"
+          target = "${{ matrix.job.target }}"
+          `nif-version` = "${{ matrix.nif }}"
+          `use-cross` = "${{ matrix.job.use-cross }}"
+          `project-dir` = "native/djot_nif"
+        }
+      }
+      (catalog.`actions/attest-build-provenance@v4`) {
+        name = "Artifact attestation"
+        with {
+          `subject-path` = "${{ steps.build-crate.outputs.file-path }}"
+        }
+      }
+      (catalog.`actions/upload-artifact@v7`) {
+        name = "Upload artifact"
+        with {
+          name = "${{ steps.build-crate.outputs.file-name }}"
+          pathList { "${{ steps.build-crate.outputs.file-path }}" }
+        }
+      }
+      (catalog.`softprops/action-gh-release@v3`) {
+        name = "Publish archives and packages"
+        `if` = "startsWith(github.ref, 'refs/tags/')"
+        with {
+          files = "${{ steps.build-crate.outputs.file-path }}"
+        }
+      }
+    }
+  }
+}
