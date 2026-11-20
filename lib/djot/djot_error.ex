@@ -1,7 +1,11 @@
 defmodule Djot.DjotError do
   @moduledoc """
-    The djot parser/transformer does not expose many errors, it either parses and transforms a document, or fails to do so.
+  Raised (or returned) when rendering, sanitizing, or highlighting a Djot document fails.
+
+  `reason` holds the underlying cause, e.g. the native error message or `{:highlight, error}`.
   """
 
-  defexception message: "An error occured transforming the Djot document"
+  defexception [:reason, message: "An error occurred transforming the Djot document"]
+
+  @type t :: %__MODULE__{reason: term(), message: String.t()}
 end

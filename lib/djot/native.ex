@@ -1,4 +1,6 @@
 defmodule Djot.Native do
+  @moduledoc false
+
   version = Mix.Project.config()[:version]
   mode = if Mix.env() in [:dev, :test], do: :debug, else: :release
   github_url = Mix.Project.config()[:package][:links][:GitHub]
@@ -15,5 +17,10 @@ defmodule Djot.Native do
       Enum.uniq(["aarch64-unknown-linux-musl" | RustlerPrecompiled.Config.default_targets()]),
     version: version
 
-  def to_html(_dj, _options), do: :erlang.nif_error(:nif_not_loaded)
+  def parse(_source), do: :erlang.nif_error(:nif_not_loaded)
+  def source_to_html(_source, _options), do: :erlang.nif_error(:nif_not_loaded)
+  def nodes_to_html(_nodes, _options), do: :erlang.nif_error(:nif_not_loaded)
+  def safe_html(_html, _sanitize, _escape), do: :erlang.nif_error(:nif_not_loaded)
+  def syntect_highlight(_source, _language, _options), do: :erlang.nif_error(:nif_not_loaded)
+  def syntect_themes, do: :erlang.nif_error(:nif_not_loaded)
 end

@@ -51,6 +51,10 @@ defmodule Djot.MixProject do
     [
       {:rustler, "~> 0.38", optional: not (@dev? or @force_build?)},
       {:rustler_precompiled, "~> 0.9"},
+      {:nimble_options, "~> 1.1"},
+      {:lumis, "~> 0.10", optional: true},
+      {:lumis_wasm_elixir, "~> 0.26", only: :test},
+      {:phoenix_live_view, "~> 1.2", optional: true},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false}
     ]
   end

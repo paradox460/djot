@@ -1,41 +1,68 @@
 #[macro_use]
 extern crate rustler;
 
-mod options;
-use crate::options::DjotOptions;
+mod ast;
+mod events;
+mod highlight;
+mod render;
+mod sanitize;
 
-use jotdown::html::Indentation;
-use jotdown::html::Renderer;
-use jotdown::Render;
-use rustler::nif;
-use rustler::Encoder;
-use rustler::Env;
-use rustler::Error as RustlerError;
 use rustler::Term;
 
-rustler::atoms! {
-  ok,
-  djot_transform
+use crate::ast::Node;
+use crate::highlight::SyntectOptions;
+use crate::render::RenderOptions;
+use crate::sanitize::SanitizeOptions;
+
+// `Result<T, String>` returns encode as `{:ok, t} | {:error, message}`.
+
+#[nif(schedule = "DirtyCpu")]
+fn parse(source: &str) -> Vec<Node> {
+    events::nodes_from_events(jotdown::Parser::new(source))
 }
 
 #[nif(schedule = "DirtyCpu")]
-pub fn to_html<'a>(env: Env<'a>, dj: &str, options: DjotOptions) -> Result<Term<'a>, RustlerError> {
-    let events = jotdown::Parser::new(dj);
-    let mut html = String::new();
+fn source_to_html(source: &str, options: RenderOptions) -> Result<String, String> {
+    render::render(jotdown::Parser::new(source), &options)
+}
 
-    let mut renderer = match options.renderer {
-        options::DjotRenderer::Default => Renderer::default(),
-        options::DjotRenderer::Minified => Renderer::minified(),
-        options::DjotRenderer::Indented => Renderer::indented(Indentation {
-            string: options.indent_string.unwrap_or_else(|| "\t".to_string()),
-            initial_level: options.indent_initial_level.unwrap_or(0),
-        }),
+#[nif(schedule = "DirtyCpu")]
+fn nodes_to_html(nodes: Term, options: RenderOptions) -> Result<String, String> {
+    let nodes: Vec<Node> = nodes
+        .decode()
+        .map_err(|_| "invalid djot node".to_string())?;
+    render::render(events::events_from_nodes(&nodes).into_iter(), &options)
+}
+
+#[nif(schedule = "DirtyCpu")]
+fn safe_html(
+    html: &str,
+    sanitize: Option<SanitizeOptions>,
+    escape: bool,
+) -> Result<String, String> {
+    let html = match &sanitize {
+        Some(s) => sanitize::clean(html, s)?,
+        None => html.to_string(),
     };
+    Ok(if escape {
+        sanitize::escape_html(&html)
+    } else {
+        html
+    })
+}
 
-    match renderer.push_events(events, &mut html) {
-        Ok(()) => Ok((ok(), html).encode(env)),
-        Err(_e) => Err(RustlerError::Term(Box::new(djot_transform()))),
-    }
+#[nif(schedule = "DirtyCpu")]
+fn syntect_highlight(
+    source: &str,
+    language: &str,
+    options: SyntectOptions,
+) -> Result<String, String> {
+    highlight::highlight(source, language, &options)
+}
+
+#[nif]
+fn syntect_themes() -> Vec<String> {
+    highlight::theme_names()
 }
 
 rustler::init!("Elixir.Djot.Native");
